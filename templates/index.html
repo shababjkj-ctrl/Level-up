@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1020">
+<title>STEAMPONK Dashboard</title>
+<style>
+:root{--bg:#17120e;--panel:#292018;--panel2:#3a2b1d;--line:#765334;--text:#f4e5c8;--muted:#c0a27c;--accent:#d99a43;--green:#83bd83;--red:#e17c61;--yellow:#e8bd68}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at 15% 0%,#604326 0,transparent 34%),radial-gradient(ellipse at 90% 15%,#49301d 0,transparent 28%),repeating-linear-gradient(135deg,#17120e 0,#17120e 8px,#1b1510 8px,#1b1510 16px);color:var(--text);font:14px/1.5 Georgia,"Times New Roman",serif}
+.wrap{max-width:1400px;margin:auto;padding:24px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:22px;padding:17px 19px;background:linear-gradient(145deg,#3a2a1b,#211810);border:2px solid #986b3e;border-radius:8px;box-shadow:inset 0 0 0 3px #21170f,0 8px 24px #0008}
+.brand h1{margin:0;font-size:27px;letter-spacing:2px;text-transform:uppercase;color:#f4c77d;text-shadow:0 2px 0 #59391d,0 0 12px #d58c3d66}
+.brand p{margin:4px 0;color:var(--muted);letter-spacing:1px}
+.actions,.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+button,.btn{border:1px solid #a87943;background:linear-gradient(#614326,#392719);color:#f7e5c5;padding:9px 13px;border-radius:5px;cursor:pointer;font-weight:700;text-decoration:none;box-shadow:inset 0 1px #e6b66e55,0 3px 0 #1b120b;transition:filter .15s,transform .15s}
+button:hover,.btn:hover{filter:brightness(1.25);transform:translateY(-1px)}
+button.primary{background:linear-gradient(#e6b35f,#a9682b);border-color:#f0c77e;color:#26170c}
+button.good{border-color:#76945c;color:#b9df9e}
+button.danger{border-color:#a44f3d;color:#ffad91}
+button.warn{border-color:#b18a43;color:#f5d58b}
+button:disabled{opacity:.5;cursor:wait}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin-bottom:16px}
+.stat,.panel{background:linear-gradient(145deg,#34271c,#211811);border:1px solid #8b623a;border-radius:8px;padding:16px;box-shadow:inset 0 0 0 2px #1c140e,0 9px 22px #0006;position:relative}
+.stat:before,.panel:before{content:"";position:absolute;left:7px;right:7px;top:5px;height:1px;background:linear-gradient(90deg,transparent,#d5a15e,transparent);opacity:.65}
+.stat small{color:var(--muted);letter-spacing:1px;text-transform:uppercase;font-size:10px}
+.stat strong{display:block;font-size:27px;margin-top:5px;color:#f3c77d;text-shadow:0 0 10px #d18c3c44;font-variant-numeric:tabular-nums}
+.layout{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(300px,.8fr);gap:14px}
+.panel h2{font-size:16px;margin:0 0 14px;color:#efc27a;letter-spacing:1.3px;text-transform:uppercase}
+.muted{color:var(--muted)}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;justify-content:space-between;margin-bottom:12px}
+.toolbar input{max-width:260px}
+input,select,textarea{width:100%;background:#17110c;border:1px solid #765334;border-radius:5px;color:#f4e5c8;padding:10px;font:inherit;outline:none}
+input:focus,select:focus,textarea:focus{border-color:#e5ae5c;box-shadow:0 0 0 2px #d8953b33,0 0 13px #d8953b22}
+label{display:block;color:#c9a77c;font-size:12px;margin:9px 0 5px;letter-spacing:.5px}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.full{grid-column:1/-1}
+textarea{min-height:115px;resize:vertical}
+.tablewrap{overflow:auto;border:1px solid #765334;border-radius:6px}
+table{width:100%;border-collapse:collapse;min-width:900px}
+th,td{text-align:left;padding:11px 10px;border-bottom:1px solid #4b3523;white-space:nowrap}
+th{color:#e2b879;font-size:10px;text-transform:uppercase;letter-spacing:.09em;background:#21170f;position:sticky;top:0}
+tr:hover td{background:#d3943b12}
+tr:last-child td{border-bottom:0}
+.uid{font-weight:700;color:#f0d5a7}
+.sub{font-size:11px;color:var(--muted)}
+.pill{display:inline-flex;padding:3px 8px;border-radius:3px;font-size:11px;font-weight:750;background:#4a3827;color:#e9d0a8;border:1px solid #765334}
+.ONLINE,.CONNECTING{background:#263d2b;color:#b9df9e;border-color:#6e9259}
+.PAUSED{background:#4a391d;color:#f5d58b;border-color:#a88742}
+.STOPPED,.EXPIRED,.OFFLINE,.ERROR{background:#48251e;color:#ffad91;border-color:#a44f3d}
+.mini{padding:6px 8px;font-size:11px;border-radius:4px}
+.ops{display:flex;gap:5px}
+.progress{height:7px;background:#1b140e;border:1px solid #765334;border-radius:2px;overflow:hidden;margin-top:6px}
+.progress i{display:block;height:100%;background:linear-gradient(90deg,#7e9b50,#c9b45c)}
+.notice{margin:12px 0;padding:10px 12px;border-radius:5px;background:#3a2b1c;color:#e7c995;border:1px solid #8b623a}
+.toast{position:fixed;right:18px;bottom:18px;max-width:min(420px,calc(100vw - 36px));padding:12px 16px;background:#3a2b1c;border:1px solid #d39a4e;border-radius:6px;color:#f8e5c5;box-shadow:0 12px 35px #000b;display:none;z-index:10}
+.empty{text-align:center;color:var(--muted);padding:30px}
+.foot{color:var(--muted);font-size:11px;margin-top:15px}
+@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}.layout{grid-template-columns:1fr}}
+@media(max-width:520px){.wrap{padding:13px}.grid{gap:8px}.stat{padding:12px}.stat strong{font-size:22px}.brand h1{font-size:21px}.formgrid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <header class="top">
+  <div class="brand"><h1>STEAMPONK</h1><p>Account manager · Live dashboard</p></div>
+  <div class="actions"><span class="muted" id="connection">Connecting…</span><button onclick="loadStats()">↻ Refresh</button><a class="btn" href="/api/accounts/download">Export JSON</a></div>
+ </header>
+ <section class="grid">
+  <div class="stat"><small>Total accounts</small><strong id="total">0</strong></div>
+  <div class="stat"><small>Running</small><strong id="running">0</strong></div>
+  <div class="stat"><small>Paused</small><strong id="paused">0</strong></div>
+  <div class="stat"><small>Total EXP gained</small><strong id="gained">0</strong></div>
+ </section>
+ <section class="grid">
+  <div class="stat"><small>Matches played</small><strong id="matches">0</strong></div>
+  <div class="stat"><small>Uptime</small><strong id="uptime">—</strong></div>
+  <div class="stat"><small>Slots</small><strong id="slots">—</strong></div>
+  <div class="stat"><small>Time remaining</small><strong id="remaining">—</strong></div>
+ </section>
+ <div class="layout">
+  <main class="panel">
+   <div class="toolbar"><h2>Accounts</h2><input id="search" placeholder="Search UID / nickname…" oninput="renderAccounts()"></div>
+   <div class="actions" style="margin-bottom:12px">
+    <button class="good" onclick="systemAction('start-all')">▶ Start all</button>
+    <button class="warn" onclick="systemAction('pause-all')">Ⅱ Pause all</button>
+    <button onclick="systemAction('refresh')">⟳ Restart all</button>
+    <button class="danger" onclick="deleteAll()">Delete all</button>
+   </div>
+   <div class="tablewrap"><table><thead><tr><th>Account</th><th>Status</th><th>Level / EXP</th><th>Daily EXP</th><th>Matches</th><th>Rate/min</th><th>Controls</th></tr></thead><tbody id="accounts"><tr><td colspan="7" class="empty">Loading accounts…</td></tr></tbody></table></div>
+   <div class="foot">Account actions are sent to the Flask API running on this same server.</div>
+  </main>
+  <aside style="display:grid;gap:14px;align-content:start">
+   <section class="panel">
+    <h2>Add one account</h2>
+    <div class="formgrid">
+     <div><label>UID (for UID + password)</label><input id="uid" placeholder="Account UID"></div>
+     <div><label>Password</label><input id="password" type="password" placeholder="Password"></div>
+     <div class="full"><label>Or token</label><input id="token" type="password" placeholder="Access token"></div>
+     <div class="full"><button class="primary" style="width:100%" onclick="addAccount()">＋ Add account</button></div>
+    </div>
+   </section>
+   <section class="panel">
+    <h2>Bulk add accounts</h2>
+    <label>One account per line: UID|PASSWORD or TOKEN|token</label>
+    <textarea id="bulk" placeholder="123456|password&#10;TOKEN|your_token"></textarea>
+    <button class="primary" style="width:100%;margin-top:9px" onclick="bulkAdd()">Import accounts</button>
+   </section>
+   <section class="panel">
+    <h2>Global limits</h2>
+    <label>Level limit (blank = unlimited)</label><input id="globalLevel" type="number" min="1" max="100" placeholder="e.g. 50">
+    <label>Daily EXP limit</label><input id="globalExp" type="number" min="1" placeholder="Default limit">
+    <button class="primary" style="width:100%;margin-top:10px" onclick="saveGlobalLimits()">Apply to all accounts</button>
+    <div class="notice">Applying limits updates every saved account. Accounts may stop when a limit is reached.</div>
+   </section>
+  </aside>
+ </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+let accountData=[];
+const $=id=>document.getElementById(id);
+const num=n=>Number(n||0).toLocaleString();
+function toast(msg){const t=$('toast');t.textContent=msg;t.style.display='block';clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>t.style.display='none',3200)}
+async function api(url,body){const opt=body===undefined?{}:{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)};const r=await fetch(url,opt);let d={};try{d=await r.json()}catch{}if(!r.ok)throw Error(d.error||('Request failed: '+r.status));return d}
+function duration(s){s=Math.max(0,Number(s||0));const h=Math.floor(s/3600),m=Math.floor(s%3600/60),sec=Math.floor(s%60);return h?`${h}h ${m}m`:m?`${m}m ${sec}s`:`${sec}s`}
+async function loadStats(){try{const d=await api('/api/stats');accountData=d.accounts||[];$('total').textContent=num(d.total_accounts);$('running').textContent=num(d.running_accounts);$('paused').textContent=num(d.paused_accounts);$('gained').textContent=num(d.total_gained_exp);$('matches').textContent=num(d.total_matches);$('uptime').textContent=duration(d.uptime);$('slots').textContent=d.slots??'—';$('remaining').textContent=d.seconds_left==null?'—':duration(d.seconds_left);$('connection').textContent='● Connected';$('connection').style.color='var(--green)';renderAccounts()}catch(e){$('connection').textContent='● Disconnected';$('connection').style.color='var(--red)';toast(e.message)}}
+function renderAccounts(){const q=$('search').value.toLowerCase();const rows=accountData.filter(a=>String(a.uid+' '+a.nickname).toLowerCase().includes(q));if(!rows.length){$('accounts').innerHTML='<tr><td colspan="7" class="empty">No matching accounts</td></tr>';return}
+$('accounts').innerHTML=rows.map(a=>{const status=String(a.status||'OFFLINE').toUpperCase();const pct=a.exp_limit?Math.min(100,Math.round((a.daily_exp_gained||0)/a.exp_limit*100)):0;return `<tr>
+<td><div class="uid">${esc(a.nickname||'Player')}</div><div class="sub">${esc(a.uid)}</div></td>
+<td><span class="pill ${esc(status)}">${esc(status)}</span></td>
+<td><b>Lv. ${num(a.level)}</b><div class="sub">${num(a.current_exp)} EXP · +${num(a.gained_exp)}</div></td>
+<td><div>${num(a.daily_exp_gained)} / ${num(a.exp_limit)}</div><div class="progress"><i style="width:${pct}%"></i></div><div class="sub">${num(a.daily_exp_remaining)} left</div></td>
+<td>${num(a.matches_played)}</td><td>${num(a.exp_rate_per_min)}</td>
+<td><div class="ops"><button class="mini good" title="Start / Resume" onclick="accountAction('start','${js(a.uid)}')">▶</button><button class="mini warn" title="Pause" onclick="accountAction('pause','${js(a.uid)}')">Ⅱ</button><button class="mini" title="Refresh" onclick="accountAction('refresh','${js(a.uid)}')">↻</button><button class="mini" title="Set limits" onclick="setLimits('${js(a.uid)}')">⚙</button><button class="mini danger" title="Delete" onclick="deleteAccount('${js(a.uid)}')">✕</button></div></td>
+</tr>`}).join('')}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function js(s){return String(s??'').replace(/\\/g,'\\\\').replace(/'/g,"\\'")}
+async function addAccount(){const uid=$('uid').value.trim(),password=$('password').value,token=$('token').value.trim();if(token===''&&(!uid||!password)){toast('Enter UID + password or a token');return}try{await api('/api/account/add',token?{token}:{uid,password});$('uid').value=$('password').value=$('token').value='';toast('Account added');loadStats()}catch(e){toast(e.message)}}
+async function bulkAdd(){const lines=$('bulk').value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean),accounts=[];for(const line of lines){const p=line.split('|');if(p[0].toUpperCase()==='TOKEN'&&p[1])accounts.push({token:p.slice(1).join('|').trim()});else if(p.length>=2)accounts.push({uid:p[0].trim(),password:p.slice(1).join('|').trim()})}if(!accounts.length){toast('No valid lines found');return}try{const d=await api('/api/accounts/bulk-add',{accounts});$('bulk').value='';toast(`Imported: ${d.added}, skipped: ${d.skipped}`);loadStats()}catch(e){toast(e.message)}}
+async function accountAction(action,uid){try{await api(`/api/account/${action}`,{uid});toast('Account command sent');setTimeout(loadStats,500)}catch(e){toast(e.message)}}
+async function deleteAccount(uid){if(!confirm('Delete account '+uid+'?'))return;try{await api('/api/account/delete',{uid});toast('Account deleted');loadStats()}catch(e){toast(e.message)}}
+async function setLimits(uid){const a=accountData.find(x=>String(x.uid)===String(uid));const level=prompt('Level limit (1–100). Leave blank for unlimited:',a?.level_limit??'');if(level===null)return;const exp=prompt('Daily EXP limit:',a?.exp_limit??'');if(exp===null)return;try{await api('/api/account/limit',{uid,limit:level.trim()===''?null:level.trim()});await api('/api/account/exp-limit',{uid,limit:exp.trim()===''?null:exp.trim()});toast('Limits updated');loadStats()}catch(e){toast(e.message)}}
+async function systemAction(action){if(action==='pause-all'&&!confirm('Pause all accounts?'))return;if(action==='refresh'&&!confirm('Restart all accounts?'))return;try{const d=await api('/api/system/'+action,{});toast(`Done · ${d.count??''} accounts`);setTimeout(loadStats,700)}catch(e){toast(e.message)}}
+async function saveGlobalLimits(){try{await api('/api/system/limits',{level_limit:$('globalLevel').value.trim()||null,exp_limit:$('globalExp').value.trim()||null});toast('Global limits applied');loadStats()}catch(e){toast(e.message)}}
+async function deleteAll(){if(prompt('Type DELETE to remove ALL accounts:')!=='DELETE')return;try{const d=await api('/api/system/delete-all',{confirm:'DELETE'});toast(`${d.count} accounts deleted`);loadStats()}catch(e){toast(e.message)}}
+loadStats();setInterval(loadStats,5000);
+</script>
+</body>
+      </html>
