@@ -5,7 +5,7 @@
 import asyncio, sys, time, secrets, socket, os, threading, uuid, json, random, logging
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
-from flask import Flask, request, jsonify, render_template, Response
+from flask import Flask, request, jsonify, render_template, Response, session
 import flask.cli
 
 if sys.platform == "win32":
@@ -160,6 +160,8 @@ LEVEL_EXP_THRESHOLDS = [
 ]
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
+# Dashboard is intentionally open: no dashboard password or login session is required.
+
 app.logger.disabled = True
 
 _state_lock = threading.RLock()
@@ -1709,6 +1711,19 @@ def api_system_refresh():
 
     threading.Thread(target=_restart_batch, args=(keys,), daemon=True).start()
     return jsonify({"status": "ok", "count": len(keys)})
+
+
+@app.get("/api/logs")
+def api_logs():
+    req_uid = str(request.args.get("uid") or "").strip()
+    if not req_uid:
+        return jsonify({"status": "error", "error": "UID is required", "logs": []}), 400
+    key = _resolve_key(req_uid)
+    if not key:
+        return jsonify({"status": "ok", "uid": req_uid, "logs": []})
+    with _state_lock:
+        lines = list(LOGS.get(key, []))
+    return jsonify({"status": "ok", "uid": req_uid, "logs": lines})
 
 
 @app.get("/api/accounts/download")

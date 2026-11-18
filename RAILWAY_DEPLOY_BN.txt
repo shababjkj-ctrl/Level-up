@@ -1,0 +1,40 @@
+STEAM PUNK LEVEL-UP — RAILWAY DEPLOY GUIDE (TERMUX)
+
+এই ZIP-এ যা ঠিক করা হয়েছে:
+- Gunicorn entrypoint: main:app (আগের app:app ভুল ছিল)
+- Procfile ও railway.json-এ Railway PORT binding
+- requirements.txt পরিষ্কার করা হয়েছে; আগের ফাইলে invalid text ছিল
+- templates/index.html-এ responsive Steam Punk dashboard
+- Dashboard login/password পুরোপুরি সরানো হয়েছে; সরাসরি dashboard খুলবে
+- /api/logs?uid=... endpoint যোগ করা হয়েছে; dashboard থেকে account-wise live log refresh হবে
+- /healthz health check রাখা হয়েছে
+
+TERMUX থেকে deploy:
+1) ZIP extract করুন এবং project folder-এ যান।
+2) Railway CLI install:
+   pkg update -y
+   pkg install nodejs-lts -y
+   npm install -g @railway/cli
+3) Login:
+   railway login
+4) এই folder থেকে existing Railway project link করুন:
+   railway link
+   Level-up project, production environment এবং সঠিক service নির্বাচন করুন।
+5) Deploy:
+   railway up
+6) Logs:
+   railway logs
+
+RAILWAY VARIABLES (সুপারিশকৃত):
+- DATA_DIR = /data  (Railway Volume mount path যদি /data হয়)
+
+Dashboard খুললেই সরাসরি Control Panel দেখা যাবে; কোনো dashboard password লাগবে না।
+
+PERSISTENCE:
+Railway service-এ Volume তৈরি করে /data-তে mount করুন এবং DATA_DIR=/data দিন। না হলে accounts.json ও token_cache.json redeploy/restart-এ হারিয়ে যেতে পারে।
+
+IMPORTANT LIMITATIONS:
+- Deployment config, Python syntax, HTML/JS structure এবং route wiring local static checks দিয়ে যাচাই করা হয়েছে। এই পরিবেশে internet বন্ধ থাকায় pip install করে Railway-এর মতো full runtime test করা যায়নি।
+- Dashboard/API কাজ করা আর external game login/API সফল হওয়া এক জিনিস নয়। কোনো UID/password-এর login success, game server availability, protocol compatibility বা account validity এই ZIP থেকে নিশ্চিত করা যায় না। Login ব্যর্থ হলে dashboard-এর ঐ account-এর LOG খুলে server-side error দেখুন।
+- Dashboard account-management API এখন password-protected session-এর পেছনে আছে। ADMIN_PASSWORD না দিয়ে public domain share করবেন না।
+- এই source-এ account credentials accounts.json-এ রাখা হয়। Railway Volume private রাখুন এবং credentials কখনো public repository/chat-এ দেবেন না।
